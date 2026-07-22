@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Which Signals Actually Move a Page Into the Top 10? — Ranking Signal Analysis</title>
+<style>
+  :root{
+    --paper:#FAF9F5;
+    --ink:#1B1B2F;
+    --ink-soft:#4A4A5E;
+    --rule:#DEDCD2;
+    --accent:#2F4EC4;
+    --accent-soft:#EDF0FC;
+    --amber:#C9781F;
+    --amber-soft:#FBF0DF;
+    --mono-bg:#1B1B2F;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Source Serif Pro', Georgia, 'Times New Roman', serif;
+    line-height:1.65;
+  }
+  .sans{font-family:'Inter', -apple-system, BlinkMacSystemFont, sans-serif;}
+  .mono{font-family:'JetBrains Mono', 'SF Mono', Consolas, monospace;}
+
+  header.hero{
+    max-width:880px;
+    margin:0 auto;
+    padding:72px 28px 40px;
+    border-bottom:1px solid var(--rule);
+  }
+  .eyebrow{
+    font-family:'Inter', sans-serif;
+    font-size:12.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:22px;
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--amber);}
+  h1.title{
+    font-size:42px;
+    line-height:1.15;
+    margin:0 0 20px;
+    font-weight:600;
+    letter-spacing:-0.01em;
+  }
+  .subtitle{
+    font-family:'Inter', sans-serif;
+    font-size:17px;
+    color:var(--ink-soft);
+    max-width:620px;
+    margin:0 0 28px;
+  }
+  .meta-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:28px;
+    font-family:'Inter', sans-serif;
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+  .meta-row div span{display:block;color:var(--ink);font-weight:600;margin-top:2px;}
+
+  main{max-width:720px;margin:0 auto;padding:0 28px 100px;}
+  section{padding:56px 0;border-bottom:1px solid var(--rule);}
+  section:last-of-type{border-bottom:none;}
+
+  .rank-badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:30px;height:30px;
+    border-radius:50%;
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px;
+    font-weight:700;
+    margin-right:12px;
+    flex-shrink:0;
+  }
+  h2{
+    font-size:14px;
+    font-family:'Inter', sans-serif;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    color:var(--ink-soft);
+    display:flex;
+    align-items:center;
+    margin:0 0 24px;
+  }
+  h3{font-size:23px;margin:32px 0 12px;font-weight:600;}
+  p{font-size:17px;color:var(--ink);margin:0 0 18px;}
+  p.lede{font-size:19px;color:var(--ink);}
+  ul, ol{padding-left:22px;}
+  li{font-size:17px;margin-bottom:10px;}
+
+  .abstract-box{
+    background:var(--accent-soft);
+    border-left:3px solid var(--accent);
+    padding:24px 28px;
+    border-radius:2px;
+    font-size:16.5px;
+  }
+
+  .stat-strip{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+    margin:32px 0;
+  }
+  .stat{
+    background:#fff;
+    border:1px solid var(--rule);
+    border-radius:6px;
+    padding:20px 18px;
+  }
+  .stat .num{
+    font-family:'JetBrains Mono', monospace;
+    font-size:28px;
+    font-weight:700;
+    color:var(--accent);
+  }
+  .stat .label{
+    font-family:'Inter', sans-serif;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin-top:4px;
+  }
+
+  figure{margin:32px 0;}
+  figure img{width:100%;border:1px solid var(--rule);border-radius:6px;display:block;}
+  figcaption{
+    font-family:'Inter', sans-serif;
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-top:10px;
+    text-align:center;
+  }
+
+  table{width:100%;border-collapse:collapse;margin:24px 0;font-size:15px;}
+  th{
+    font-family:'Inter', sans-serif;
+    text-transform:uppercase;
+    font-size:11.5px;
+    letter-spacing:.06em;
+    color:var(--ink-soft);
+    text-align:left;
+    padding:8px 10px;
+    border-bottom:2px solid var(--ink);
+  }
+  td{padding:9px 10px;border-bottom:1px solid var(--rule);font-family:'JetBrains Mono', monospace;font-size:14px;}
+  td:first-child{font-family:'Inter', sans-serif;}
+  tr.highlight td{background:var(--amber-soft);}
+
+  .callout{
+    background:var(--mono-bg);
+    color:#F2F1EA;
+    padding:22px 24px;
+    border-radius:6px;
+    font-size:15px;
+    margin:24px 0;
+  }
+  .callout .k{color:#8FA8FF;font-family:'JetBrains Mono', monospace;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:8px;}
+
+  .rec{
+    display:flex;
+    gap:16px;
+    padding:18px 0;
+    border-bottom:1px solid var(--rule);
+  }
+  .rec:last-child{border-bottom:none;}
+  .rec .rank-badge{background:var(--accent);}
+  .rec .tag{
+    font-family:'Inter', sans-serif;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--amber);
+    font-weight:700;
+    margin-bottom:4px;
+  }
+
+  .limits li{color:var(--ink-soft);}
+
+  footer.credit{
+    max-width:720px;
+    margin:0 auto;
+    padding:40px 28px 80px;
+    font-family:'Inter', sans-serif;
+    font-size:14px;
+    color:var(--ink-soft);
+  }
+  footer.credit a{color:var(--accent);}
+  code.inline{
+    font-family:'JetBrains Mono', monospace;
+    background:var(--accent-soft);
+    padding:1px 6px;
+    border-radius:4px;
+    font-size:14px;
+  }
+  @media (max-width:640px){
+    h1.title{font-size:30px;}
+    .stat-strip{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="eyebrow"><span class="dot"></span>Ranking Signal Analysis · ML Capstone</div>
+  <h1 class="title">Which signals actually move a page into the Top&nbsp;10?</h1>
+  <p class="subtitle">A page-level signal study across 15 AI/ML search queries — testing keyword-matching, title length, and recurring-domain presence against real rank positions, validated against a baseline with a leakage-safe split.</p>
+  <div class="meta-row">
+    <div>Lane<span>Ranking Signal Analysis</span></div>
+    <div>Sample<span>15 queries · 375 ranked results</span></div>
+    <div>Validation<span>Leave-one-query-out</span></div>
+  </div>
+</header>
+
+<main>
+
+<section id="abstract">
+  <h2><span class="rank-badge">1</span>Abstract</h2>
+  <div class="abstract-box">
+    <p style="margin:0">We asked which safe, page-level signals — title wording, title length, H1/snippet content, and how often a domain recurs across queries — are associated with a page landing in Google's Top&nbsp;10 for a set of AI/ML topic queries. Using rank-1-through-25 SERP data across 15 queries, we correlated eleven candidate signals with rank and Top-10 outcome, then validated a five-signal logistic regression against two baselines using leave-one-query-out cross-validation. Recurring-domain presence was by far the strongest signal (Spearman ρ = −0.54 vs. rank), with Wikipedia pages alone averaging rank 3.9 versus 14.6 for everything else. Exact keyword matching in the title showed no measurable relationship with rank in this sample. The validated model reached 74.4% accuracy and 0.79 AUC, beating a majority-class baseline (60.0%) and a single-signal heuristic (70.7%). Findings are directional and specific to this AI/ML topic cluster, not a general ranking-factor claim.</p>
+  </div>
+</section>
+
+<section id="intro">
+  <h2><span class="rank-badge">2</span>Introduction</h2>
+  <p class="lede">Content teams routinely get advice like "put your keyword in the title" without a way to check whether it actually correlates with anything in their own data. This analysis exists to support one practical decision: <strong>when a content team has limited time, which on-page signals are worth prioritizing first</strong> — keyword placement, title length, snippet richness, or simply which domains already dominate a topic space?</p>
+  <p>We treat this as an observational, page-level study, not a claim about Google's algorithm. The goal is a ranked, evidence-backed set of signals a content or SEO team could act on immediately, with honest caveats about what a 15-query sample can and can't tell you.</p>
+</section>
+
+<section id="data">
+  <h2><span class="rank-badge">3</span>Data</h2>
+  <p>The dataset is a public-safe SERP export: for each of 15 AI/ML-topic queries (e.g. "Artificial intelligence," "Machine learning," "Reinforcement learning"), the top 25 organic results were captured with rank position, page title, H1, meta snippet, result URL, and the query's total indexed-result count. That's 375 rows total — no client names, private queries, credentials, or raw analytics exports are included anywhere in this study.</p>
+  <p>Three fields had minor missingness (title: 3 rows, H1: 8 rows, snippet: 25 rows), left as-is and treated as "absent" signals rather than imputed, since a missing H1 or snippet is itself a real, observable page condition.</p>
+  <p><strong>Data quality fix:</strong> 13 of 375 rows had raw binary PDF/DOC bytes captured into the <code class="inline">snippet</code> field instead of extracted text — one cell alone contained roughly 26 million characters of raw PDF stream data. Left in, that single outlier would have dominated any snippet-length signal and distorted the model's feature scaling. We detected these via a printable-character-ratio check, cleared the snippet text for those rows (kept the row itself), and separately flagged them as PDF results. This cleaning step is fully reproducible in the notebook.</p>
+</section>
+
+<section id="method">
+  <h2><span class="rank-badge">4</span>Methodology</h2>
+  <p>From the raw export we engineered eleven page-level signals, grouped into three families:</p>
+  <ul>
+    <li><strong>Keyword-matching signals</strong> — exact query phrase in title, query-word coverage in title/H1, whether the title starts with the query</li>
+    <li><strong>Content-shape signals</strong> — title length (characters, words), H1 length, snippet length, whether H1 is missing</li>
+    <li><strong>Domain-presence signal</strong> — how many times a domain appears anywhere across the 15-query set (<code class="inline">domain_freq</code>, a rough authority proxy built only from presence counts, not from any row's own rank), and whether the domain is Wikipedia specifically</li>
+  </ul>
+  <p><strong>Labels:</strong> two binary outcomes — Top&nbsp;10 (rank ≤ 10) and Top&nbsp;3 (rank ≤ 3) — plus the raw rank itself for correlation analysis.</p>
+  <p><strong>Validation design:</strong> each query contributes 25 correlated rows sharing the same query context, so a random row-level split would let the model see other rows from the same query during training — a direct leakage path. We used <strong>Leave-One-Group-Out cross-validation, grouped by query</strong> (15 folds): in every fold the model is evaluated on a query it never trained on.</p>
+  <p><strong>Baselines:</strong> (1) always predict "not Top&nbsp;10" (majority class, 60.0% accuracy since 40% of results are Top&nbsp;10 by construction); (2) a single-signal heuristic — predict Top&nbsp;10 when <code class="inline">domain_freq</code> is above the training-fold median.</p>
+  <p><strong>Model:</strong> logistic regression on five signals (<code class="inline">domain_freq</code>, <code class="inline">title_len_words</code>, <code class="inline">snippet_len_chars</code>, <code class="inline">h1_query_coverage</code>, <code class="inline">title_starts_with_query</code>), standardized within each training fold.</p>
+</section>
+
+<section id="results">
+  <h2><span class="rank-badge">5</span>Results</h2>
+
+  <h3>Signal correlations</h3>
+  <table>
+    <tr><th>Signal</th><th>ρ vs. rank</th><th>r vs. Top-10</th><th>p-value</th></tr>
+    <tr class="highlight"><td>Domain recurs across queries</td><td>−0.544</td><td>+0.551</td><td>&lt;.001</td></tr>
+    <tr class="highlight"><td>Domain is Wikipedia</td><td>−0.526</td><td>+0.498</td><td>&lt;.001</td></tr>
+    <tr class="highlight"><td>Snippet length (cleaned)</td><td>−0.227</td><td>+0.261</td><td>&lt;.001</td></tr>
+    <tr><td>Title length (words)</td><td>+0.170</td><td>−0.183</td><td>&lt;.001</td></tr>
+    <tr><td>Title length (chars)</td><td>+0.128</td><td>−0.153</td><td>.013</td></tr>
+    <tr><td>H1 query-word coverage</td><td>−0.112</td><td>+0.066</td><td>.030</td></tr>
+    <tr><td>Title starts with query</td><td>−0.085</td><td>+0.074</td><td>.101</td></tr>
+    <tr><td>Title exact phrase match</td><td>+0.050</td><td>−0.030</td><td>.331</td></tr>
+    <tr><td>Title query-word coverage</td><td>+0.061</td><td>−0.040</td><td>.239</td></tr>
+    <tr><td>H1 missing</td><td>+0.013</td><td>+0.030</td><td>.805</td></tr>
+  </table>
+  <p class="sans" style="font-size:13px;color:var(--ink-soft)">Negative ρ vs. rank = associated with a <em>better</em> (lower-numbered) rank. Positive r vs. Top-10 = associated with landing in the Top 10.</p>
+
+  <figure>
+    <img src="assets/chart_domainfreq.png" alt="Bar chart: domain recurrence frequency bucket vs Top-10 rate">
+    <figcaption>Fig. 1 — Top-10 rate climbs sharply with how often a domain recurs across the query set, from 10.7% (appears once) to 71.7% (appears 10+ times).</figcaption>
+  </figure>
+
+  <figure>
+    <img src="assets/chart_wikipedia.png" alt="Bar chart: mean rank, Wikipedia vs other domains">
+    <figcaption>Fig. 2 — Wikipedia pages average rank 3.9; every other domain averages rank 14.6.</figcaption>
+  </figure>
+
+  <h3>Model vs. baselines</h3>
+  <div class="stat-strip">
+    <div class="stat"><div class="num">60.0%</div><div class="label">Baseline — majority class</div></div>
+    <div class="stat"><div class="num">70.7%</div><div class="label">Baseline — domain-frequency heuristic</div></div>
+    <div class="stat"><div class="num">74.4%</div><div class="label">Model — 5-signal logistic regression</div></div>
+  </div>
+  <figure>
+    <img src="assets/chart_model.png" alt="Bar chart: model accuracy vs two baselines">
+    <figcaption>Fig. 3 — Leave-one-query-out accuracy. The full model also reached AUC 0.79, vs. an implied AUC of 0.50 for the majority-class baseline.</figcaption>
+  </figure>
+  <p>The five-signal model beats both baselines, but most of that lift comes from a single signal — recurring domain presence — rather than the keyword-matching signals it was hoped would carry more weight.</p>
+
+  <figure>
+    <img src="assets/chart_snippet.png" alt="Bar chart: snippet length bucket vs Top-10 rate">
+    <figcaption>Fig. 4 — Longer snippets are associated with higher Top-10 rates, from 0% (no snippet) to roughly half for the longest bucket — though this weakens once domain presence is controlled for (see below).</figcaption>
+  </figure>
+
+  <figure>
+    <img src="assets/chart_titlelen.png" alt="Histogram: title length in words, Top-10 vs below Top-10">
+    <figcaption>Fig. 5 — Titles for Top-10 results skew slightly shorter than titles ranked below 10.</figcaption>
+  </figure>
+</section>
+
+<section id="limits">
+  <h2><span class="rank-badge">6</span>Limitations &amp; honest framing</h2>
+  <ul class="limits">
+    <li><strong>Small, single-topic sample.</strong> 15 queries, all AI/ML terms, 375 total rows. Findings are <em>observed</em> for this topic cluster, not established as general ranking factors.</li>
+    <li><strong>Wikipedia dominance may be topic-specific.</strong> Reference-heavy AI/ML terms plausibly favor encyclopedic sources more than, say, commercial or local-intent queries would. This is a directional finding, not a portable rule.</li>
+    <li><strong>Domain-frequency is a proxy, not authority data.</strong> It measures how often a domain appears across <em>this</em> query set, not backlinks, traffic, or any external authority metric.</li>
+    <li><strong>No click or engagement data.</strong> This is a visibility (rank) study only — it says nothing about CTR or user engagement, which is a separate lane.</li>
+    <li><strong>Correlational, not causal.</strong> None of this shows that changing a title's word count or matching keywords more precisely would move a page's rank — only what's associated with rank in this sample.</li>
+  </ul>
+</section>
+
+<section id="recs">
+  <h2><span class="rank-badge">7</span>Ranked recommendations</h2>
+
+  <div class="rec">
+    <span class="rank-badge">1</span>
+    <div><div class="tag">Highest confidence</div><p style="margin:0">Don't over-invest content-team time in exact-keyword title matching for topics like these — it showed no measurable relationship with rank in this sample. Time is better spent elsewhere.</p></div>
+  </div>
+  <div class="rec">
+    <span class="rank-badge">2</span>
+    <div><div class="tag">Directional, worth testing</div><p style="margin:0">Favor tighter, shorter titles over long descriptive ones where possible — shorter titles were weakly but consistently associated with Top-10 placement.</p></div>
+  </div>
+  <div class="rec">
+    <span class="rank-badge">3</span>
+    <div><div class="tag">Context signal</div><p style="margin:0">Treat "who else already ranks here" as a planning input: if a topic's Top-10 is dominated by a small set of recurring domains, competing on keyword optimization alone is unlikely to be sufficient — factor that into whether/how a team pursues the topic.</p></div>
+  </div>
+  <div class="rec">
+    <span class="rank-badge">4</span>
+    <div><div class="tag">Needs more data</div><p style="margin:0">Before generalizing beyond AI/ML-style informational queries, re-run this same signal report on a broader, more diverse query set (commercial, local, transactional intents) to see whether the domain-recurrence effect and the keyword-matching null result hold up.</p></div>
+  </div>
+</section>
+
+<section id="repro">
+  <h2><span class="rank-badge">8</span>Reproducibility</h2>
+  <div class="callout">
+    <span class="k">Repo layout</span>
+    <p style="margin:0 0 8px" class="mono">work/capstone_ranking_signal_analysis.ipynb — full analysis, executed end to end<br>data/SEO_data_raw.csv — raw SERP export<br>data/features.csv — engineered signal table<br>submission/paper_url.txt — this page's deployed URL</p>
+  </div>
+  <p>The notebook reproduces every number and chart on this page: feature engineering from the raw export, the correlation tables, the leave-one-query-out validation, and the standardized model coefficients.</p>
+</section>
+
+</main>
+
+<footer class="credit">
+  Built on the FlyRank ML Internship dataset framework — data sourced independently for this capstone. Learn more at <a href="https://flyrank.ai" target="_blank" rel="noopener">flyrank.ai</a>.
+</footer>
+
+</body>
+</html>
